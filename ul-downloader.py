@@ -13,6 +13,7 @@ from codecs import decode, encode
 from collections import namedtuple
 from Crypto.Cipher import AES
 import datetime
+from os.path import expanduser
 import re
 import requests
 import sys
@@ -73,7 +74,7 @@ def get_links(dlc_data):
 def download_files(links):
 
 	payload = { }
-	with open('/home/dominic/.config.ug', 'r') as config_file:
+	with open(expanduser('~') + '/.config.ug', 'r') as config_file:
 		for line in config_file.readlines():
 			payload[line.split('=')[0]] = line.split('=')[1]
 	uploaded_login = requests.post('http://uploaded.net/io/login', data=payload)

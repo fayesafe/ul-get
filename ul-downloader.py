@@ -73,12 +73,14 @@ def get_links(dlc_data):
 def download_files(links):
 
 	payload = { }
-	with open('~/.config.ug', 'r') as config_file:
+	with open('/home/dominic/.config.ug', 'r') as config_file:
 		for line in config_file.readlines():
-			payload[line.split('=')[0]] = line.split[1]
+			payload[line.split('=')[0]] = line.split('=')[1]
 	uploaded_login = requests.post('http://uploaded.net/io/login', data=payload)
 	uploaded_login.raise_for_status()
 	for link in links:
+		if not ('ul' in link.url or 'uploaded' in link.url):
+			continue
 		print('Processing', link.filename, link.url, '...')
 		file_request = requests.get(link.url, cookies=uploaded_login.cookies)
 		pattern = 'action=\".*?\"'

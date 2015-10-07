@@ -6,14 +6,15 @@ personal use only.
 Usage: ul-downloader <dlc-file>
 """
 
-#TODO: Continue a Download
-#TODO: Concurrent Downloads
+#TODO: Continue a Download??
+#TODO: Concurrent Downloads??
+#TODO: Take a list of Links as Input
 
 import base64
 from codecs import decode, encode
 from Crypto.Cipher import AES
 import datetime
-from os.path import expanduser
+from os.path import expanduser, getsize
 import re
 import requests
 import sys
@@ -60,7 +61,8 @@ def download_files(links):
     with open(expanduser('~') + '/.config.ug', 'r') as config_file:
         for line in config_file.readlines():
             payload[line.split('=')[0]] = line.split('=')[1]
-    uploaded_login = requests.post('http://uploaded.net/io/login', data=payload)
+    uploaded_login = requests.post(
+        'http://uploaded.net/io/login', data=payload)
     uploaded_login.raise_for_status()
     for link in links:
         if not ('ul' in link or 'uploaded' in link):
@@ -76,14 +78,24 @@ def download_files(links):
             dl_url = match.group().replace('action=', '').replace('"', '')
             dl_request = requests.get(dl_url, stream=True)
             filename = dl_request.headers['content-disposition'].split('"')[1]
+            print('Filename:', filename)
+            full_size = int(dl_request.headers['content-length'])
             with open('./' + filename, 'wb') as output_file:
                 for chunk in dl_request.iter_content(chunk_size=1024):
+                    filesize = getsize('./' + filename)
+                    update_progress(int(filesize / full_size * 100))
                     if chunk:
                         output_file.write(chunk)
                         output_file.flush()
+            update_progress(100)
         except AttributeError as e:
             print(e)
-        print('... Done.')
+        print('\n... Done.')
+
+
+def update_progress(progress):
+    sys.stdout.write('\r[ {0} ] {1}%'.format(
+        '='*int(progress/2) + ' '* (50 - int(progress/2)), progress))
 
 
 def main(dlc_files):

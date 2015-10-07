@@ -11,7 +11,6 @@ Usage: ul-downloader <dlc-file>
 
 import base64
 from codecs import decode, encode
-from collections import namedtuple
 from Crypto.Cipher import AES
 import datetime
 from os.path import expanduser
@@ -46,29 +45,12 @@ def get_dlc_data(dlc_file):
 
 def get_links(dlc_data):
 
-    Link = namedtuple('Link', ['filename', 'url'])
     links = []
     dlc_root = ElementTree.fromstring(dlc_data)
     for x in dlc_root.findall('content/package/file'):
         url = decode(
             x.find('url').text.encode('ascii'), 'base64').decode('utf-8')
-        try:
-            filename = decode(x.find(
-                'filename').text.encode('utf-8'), 'base64').decode('utf-8')
-
-        # if filename is not specified within the dlc
-        # get it from the ul-page
-
-        except AttributeError:
-            page_dl = requests.get(url)
-            pattern = '<a .*? id=\"filename\".*?>.*?</a>'
-            filename_regex = re.compile(pattern)
-            match = filename_regex.search(page_dl.text)
-            try:
-                filename = match.group().split('>')[1].split('<')[0]
-            except AttributeError:
-                filename = 'file' + str(datetime.datetime.now())
-        links.append(Link(filename=filename, url=url))
+        links.append(url)
     return links
 
 
@@ -81,19 +63,20 @@ def download_files(links):
     uploaded_login = requests.post('http://uploaded.net/io/login', data=payload)
     uploaded_login.raise_for_status()
     for link in links:
-        if not ('ul' in link.url or 'uploaded' in link.url):
-            print('omitting file:', link.url, 'named:', link.filename)
+        if not ('ul' in link or 'uploaded' in link):
+            print('omitting file:', link)
             print('no vaid uploaded.net-link')
             continue
-        print('Processing', link.filename, link.url, '...')
-        file_request = requests.get(link.url, cookies=uploaded_login.cookies)
+        print('Processing', link, '...')
+        file_request = requests.get(link, cookies=uploaded_login.cookies)
         pattern = 'action=\".*?\"'
         regex = re.compile(pattern)
         match = regex.search(file_request.text)
         try:
             dl_url = match.group().replace('action=', '').replace('"', '')
             dl_request = requests.get(dl_url, stream=True)
-            with open('./' + link.filename, 'wb') as output_file:
+            filename = dl_request.headers['content-disposition'].split('"')[1]
+            with open('./' + filename, 'wb') as output_file:
                 for chunk in dl_request.iter_content(chunk_size=1024):
                     if chunk:
                         output_file.write(chunk)

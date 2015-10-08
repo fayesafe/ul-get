@@ -65,7 +65,7 @@ def download_files(links):
         'http://uploaded.net/io/login', data=payload)
     uploaded_login.raise_for_status()
     for link in links:
-        if not ('ul' in link or 'uploaded' in link):
+        if not ('ul.' in link or 'uploaded.' in link):
             print('omitting file:', link)
             print('no vaid uploaded.net-link')
             continue
@@ -90,12 +90,12 @@ def download_files(links):
             update_progress(100)
         except AttributeError as e:
             print(e)
-        print('\n... Done.')
+        print('\n')
 
 
 def update_progress(progress):
-    sys.stdout.write('\r[ {0} ] {1}%'.format(
-        '='*int(progress/2) + ' '* (50 - int(progress/2)), progress))
+    print('\r[ {0} ] {1}%'.format(
+        '='*int(progress/2) + ' '* (50 - int(progress/2)), progress), end='')
 
 
 def main(dlc_files):

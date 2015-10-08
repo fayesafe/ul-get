@@ -65,7 +65,7 @@ def download_files(links):
         'http://uploaded.net/io/login', data=payload)
     uploaded_login.raise_for_status()
     for link in links:
-        if not ('ul' in link or 'uploaded' in link):
+        if not ('ul.' in link or 'uploaded.' in link):
             print('omitting file:', link)
             print('no vaid uploaded.net-link')
             continue

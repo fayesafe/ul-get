@@ -6,7 +6,6 @@ personal use only.
 Usage: ul-downloader <dlc-file>
 """
 
-#TODO: Continue a Download??
 #TODO: Concurrent Downloads??
 #TODO: Take a list of Links as Input
 
@@ -14,7 +13,7 @@ import base64
 from codecs import decode, encode
 from Crypto.Cipher import AES
 import datetime
-from os.path import expanduser, getsize
+from os.path import expanduser, getsize, exists
 import re
 import requests
 import sys
@@ -80,6 +79,10 @@ def download_files(links):
             filename = dl_request.headers['content-disposition'].split('"')[1]
             print('Filename:', filename)
             full_size = int(dl_request.headers['content-length'])
+            if exists(
+                './' + filename) and getsize('./' + filename) == full_size:
+                print('File', filename, 'is already downloaded, omitting...')
+                continue
             with open('./' + filename, 'wb') as output_file:
                 for chunk in dl_request.iter_content(chunk_size=1024):
                     filesize = getsize('./' + filename)

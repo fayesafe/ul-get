@@ -97,8 +97,14 @@ def download_files(links):
 
 
 def update_progress(progress):
-    print('\r[ {0} ] {1}%'.format(
-        '='*int(progress/2) + ' '* (50 - int(progress/2)), progress), end='')
+    if progress % 2 == 0:
+        print('\r[ {0} ] {1}%'.format(
+            '=' * int(progress/2) + ' ' * (
+            50 - int(progress/2)), progress), end='')
+    else:
+        print('\r[ {0} ] {1}%'.format(
+            '='*int(progress/2) + '-' + ' ' * (
+            49 - int(progress/2)), progress), end='')
 
 
 def main(dlc_files):

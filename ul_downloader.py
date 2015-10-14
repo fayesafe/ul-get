@@ -9,6 +9,7 @@ Usage: ul-downloader <dlc-file>
 #TODO: Concurrent Downloads??
 #TODO: Take a list of Links as Input
 
+import argparse
 import base64
 from codecs import decode, encode
 from Crypto.Cipher import AES
@@ -16,17 +17,17 @@ import datetime
 from os.path import expanduser, getsize, exists
 import re
 import requests
-import sys
 import xml.etree.ElementTree as ElementTree
 
 KEY = "cb99b5cbc24db398"
 IV = "9bc24cb995cb8db3"
-API_URL = "http://service.jdownloader.org/dlcrypt/service.php?srcType=dlc&destType=pylo&data=%s"
+API_URL = "http://service.jdownloader.org/dlcrypt/\
+service.php?srcType=dlc&destType=pylo&data=%s"
 
 def get_dlc_data(dlc_file):
 
     try:
-        with open(dlc_file) as dlc:
+        with open(dlc_file, 'r') as dlc:
             dlc_cont = dlc.read().strip()
     except FileNotFoundError:
         print('Error found while processing file, exiting ...')
@@ -75,7 +76,7 @@ def download_files(links):
         match = regex.search(file_request.text)
         try:
             dl_url = match.group().replace('action=', '').replace('"', '')
-            dl_request = requests.get(dl_url, stream=True)
+            dl_request = requests.get(dl_url, stream=True, verify=False)
             filename = dl_request.headers['content-disposition'].split('"')[1]
             print('Filename:', filename)
             full_size = int(dl_request.headers['content-length'])
@@ -97,6 +98,7 @@ def download_files(links):
 
 
 def update_progress(progress):
+
     if progress % 2 == 0:
         print('\r[ {0} ] {1}%'.format(
             '=' * int(progress/2) + ' ' * (
@@ -107,18 +109,36 @@ def update_progress(progress):
             49 - int(progress/2)), progress), end='')
 
 
-def main(dlc_files):
+def main(dlc_file):
 
-    for dlc_file in dlc_files:
-        dlc_data = get_dlc_data(dlc_file)
-        links = get_links(dlc_data)
-        download_files(links)
+    dlc_data = get_dlc_data(dlc_file)
+    links = get_links(dlc_data)
+    download_files(links)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        main(sys.argv[1:])
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-l', '--download_list',
+        help='Download a file that contains a list of links.',
+        action='store_true')
+    parser.add_argument('file', help='File that contains relevant data')
+    args = parser.parse_args()
+
+    if args.download_list:
+        try:
+            link_file = open(args.file, 'r')
+            links = [x.rstrip() for x in link_file.readlines()]
+            download_files(links)
+            link_file.close()
+        except KeyboardInterrupt:
+            print('\nProgram killed by user.')
+        except:
+            print('\nNo valid Link File provided.')
     else:
-        print('No DLC-File found, exiting ...')
-        print('ul-downloader <dlc-file>')
-        exit(1)
+        try:
+            main(args.file)
+        except KeyboardInterrupt:
+            print('\nProgram killed by user.')
+        except:
+            print('\nNo valid DLC File provided.')

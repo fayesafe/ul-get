@@ -7,7 +7,6 @@ Usage: ul-downloader <dlc-file>
 """
 
 #TODO: Concurrent Downloads??
-#TODO: Take a list of Links as Input
 
 import argparse
 import base64

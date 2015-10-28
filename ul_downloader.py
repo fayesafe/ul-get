@@ -3,7 +3,7 @@
 """This Script can be used to download all files contained in a dlc-file. For
 personal use only.
 
-Usage: ul-downloader <dlc-file>
+Usage: ul-downloader [args] <dlc-file>
 """
 
 #TODO: Concurrent Downloads??
@@ -132,12 +132,14 @@ if __name__ == '__main__':
             link_file.close()
         except KeyboardInterrupt:
             print('\nProgram killed by user.')
-        except:
-            print('\nNo valid Link File provided.')
+        except Exception as e:
+            print('\nInternal Error occured:')
+            print(e)
     else:
         try:
             main(args.file)
         except KeyboardInterrupt:
             print('\nProgram killed by user.')
-        except:
-            print('\nNo valid DLC File provided.')
+        except Exception as e:
+            print('\nInternal Error occured:')
+            print(e)

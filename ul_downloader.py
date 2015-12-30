@@ -13,9 +13,10 @@ import base64
 from codecs import decode, encode
 from Crypto.Cipher import AES
 import datetime
-from os.path import expanduser, getsize, exists
+from os.path import devnull, expanduser, getsize, exists
 import re
 import requests
+import sys
 import xml.etree.ElementTree as ElementTree
 
 KEY = "cb99b5cbc24db398"
@@ -121,8 +122,13 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--download_list',
         help='Download a file that contains a list of links.',
         action='store_true')
+    parser.add_argument('-q', '--quiet',
+        help='surpress programm output to stdout', action='store_true')
     parser.add_argument('file', help='File that contains relevant data')
     args = parser.parse_args()
+
+    if args.quiet:
+        sys.stdout = open(devnull, 'w')
 
     if args.download_list:
         try:

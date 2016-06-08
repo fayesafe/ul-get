@@ -15,5 +15,4 @@ ul-get -l <List of Links>
 
 ul-get [-h] [-l] file
 ```
-##### PICTURE(S):
-![Process of a download](http://fayesafe.org/img/screen.png)
+

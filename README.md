@@ -6,6 +6,7 @@ This program can be used to download all files from a given DLC-File. At the Mom
 
 * Concurrent Downloads
 * Restarting Downloads
+* Finish quiet mode
 
 ##### USAGE:
 

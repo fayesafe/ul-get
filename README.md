@@ -16,3 +16,7 @@ ul-get -l <List of Links>
 
 ul-get [-h] [-l] [-q] file
 ```
+
+##### DISCLAIMER:
+
+Please do not use to download pirated copies.

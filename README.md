@@ -14,7 +14,7 @@ This program can be used to download all files from a given DLC-File. At the Mom
 ul-get <DLC-File>
 ul-get -l <List of Links>
 
-ul-get [-h] [-l] file
+ul-get [-h] [-l] [-q] file
 ```
 ##### PICTURE(S):
 ![Process of a download](http://fayesafe.org/img/screen.png)
